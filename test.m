@@ -11,7 +11,9 @@ v = 0.5*ones(n, 1);
 a = 0.5*ones(n, 1);
 
 pin('load', urdf)
-D = pin('crba', q)
+pin('getDynamicParameters', 1)
+% bodyID = pin('getBodyId', 'ee_link')
+% D = pin('crba', q)
 Y = pin('computeJointTorqueRegressor', q, v, a)
 
 pin('exit')

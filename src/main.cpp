@@ -312,7 +312,8 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
 		const mwSize* sz1 = mxGetDimensions(prhs[1]);
         const mwSize* sz2 = mxGetDimensions(prhs[2]);
         const mwSize* sz3 = mxGetDimensions(prhs[3]);
-        if( mxGetNumberOfDimensions(prhs[1])!=2 || sz1[0]!=nq || sz1[1]!=1 || sz2[0]!=nv || sz2[1]!=1 || sz3[0]!=nv || sz3[1]!=1)
+        if( mxGetNumberOfDimensions(prhs[1])!=2 || mxGetNumberOfDimensions(prhs[2])!=2 || mxGetNumberOfDimensions(prhs[3])!=2 
+            || sz1[0]!=nq || sz1[1]!=1 || sz2[0]!=nv || sz2[1]!=1 || sz3[0]!=nv || sz3[1]!=1 )
         {
             mexErrMsgTxt("invalid input dimensions\n");
             return;
@@ -337,7 +338,35 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
 
 
 
+    //---------------------------- getDynamicParameters ----------------------------//
+    else if ( !strcmp(command, "getDynamicParameters") )
+    {
+        lock_guard<mutex> guard(mtx);
 
+        if( !pin->initialized_ )
+        {
+            mexErrMsgTxt("Load the model first!\n");
+            return;
+        }        
+        
+        // Number of inertial parameters
+        int n = 10;
+        
+        // check argument 
+        int nbodies = pin->modelPtr_->nbodies;
+        int bodyID = mxGetScalar(prhs[1]);
+        if( bodyID >= nbodies || bodyID < 0 )
+        {
+            mexErrMsgTxt("Invalid BodyID\n");
+            return;
+        }
+        else
+        {
+            plhs[0] = mxCreateDoubleMatrix(n, 1, mxREAL);
+            memcpy(mxGetPr(plhs[0]), pin->modelPtr_->inertias[bodyID].toDynamicParameters().data(), sizeof(double)*10);
+        }
+
+    }
 
 
     //---------------------------- terminate ----------------------------//

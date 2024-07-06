@@ -62,9 +62,10 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
         return;
     }
 
-    mxGetString(prhs[0], command, 100);
-    
+
+
     //---------------------------- load urdf ----------------------------//
+    mxGetString(prhs[0], command, 100);
     if( !strcmp(command, "load") )
     {
         // check for repeated initialization
@@ -241,7 +242,6 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
         }
 
     }
-
 
 
 

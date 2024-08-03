@@ -12,6 +12,7 @@
 #include "pinocchio/algorithm/crba.hpp"
 #include "pinocchio/algorithm/joint-configuration.hpp"
 #include "pinocchio/algorithm/regressor.hpp"
+#include "pinocchio/algorithm/jacobian.hpp"
 
 using namespace std;
 

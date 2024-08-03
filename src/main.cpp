@@ -198,6 +198,140 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     }
 
 
+    //---------------------------- computeFrameJacobian ----------------------------//
+    else if ( !strcmp(command, "computeFrameJacobian") )
+    {
+        lock_guard<mutex> guard(mtx);
+
+        if( !pin->initialized_ )
+        {
+            mexErrMsgTxt("Load the model first!\n");
+            return;
+        }        
+        
+        // check argument 
+        if( nrhs<3 && !mxIsNumeric(prhs[1]) && mxGetClassID(prhs[2])!=mxCHAR_CLASS )
+        {
+            mexErrMsgTxt("second input must be double and third input must be a string\n");
+            return;
+        }
+
+        Eigen::MatrixXd J;
+        J.setZero(6, pin->nv_);
+
+        Eigen::VectorXd q;
+        q.setZero(pin->nq_);
+
+        memcpy(q.data(), mxGetPr(prhs[1]), sizeof(double)*(pin->nq_));
+        
+        mxGetString(prhs[2], fieldname, 100);
+        if( pin->modelPtr_->existFrame((string) fieldname) )
+        {
+            pinocchio::FrameIndex FRAME_ID = pin->modelPtr_->getFrameId((string) fieldname);
+            pin->forwardKinematics(q);
+            pinocchio::computeFrameJacobian(*(pin->modelPtr_), *(pin->dataPtr_), q, FRAME_ID, pinocchio::ReferenceFrame::LOCAL_WORLD_ALIGNED, J);
+            plhs[0] = mxCreateDoubleMatrix(J.rows(), J.cols(), mxREAL);
+            memcpy(mxGetPr(plhs[0]), J.data(), sizeof(double)*J.rows()*J.cols());
+        }
+        else
+        {
+            mexErrMsgTxt("invalid input\n");
+        }
+
+    }
+
+
+    //---------------------------- data.oMf.pose ----------------------------//
+    else if ( !strcmp(command, "data.oMf.pose") )
+    {
+        lock_guard<mutex> guard(mtx);
+
+        if( !pin->initialized_ )
+        {
+            mexErrMsgTxt("Load the model first!\n");
+            return;
+        }        
+        
+        // check argument 
+        if( nrhs<2 && mxGetClassID(prhs[1])!=mxCHAR_CLASS )
+        {
+            mexErrMsgTxt("second input must be a string\n");
+            return;
+        }
+
+        Eigen::Vector3d p;
+        Eigen::Matrix3d R;
+        p.setZero();
+        R.setZero();
+
+        
+        mxGetString(prhs[1], fieldname, 100);
+        if( pin->modelPtr_->existFrame((string) fieldname) )
+        {
+            pinocchio::FrameIndex FRAME_ID = pin->modelPtr_->getFrameId((string) fieldname);
+            p = pin->dataPtr_->oMf[FRAME_ID].translation();
+            R = pin->dataPtr_->oMf[FRAME_ID].rotation();
+            plhs[0] = mxCreateDoubleMatrix(p.rows(), p.cols(), mxREAL);
+            plhs[1] = mxCreateDoubleMatrix(R.rows(), R.cols(), mxREAL);
+            memcpy(mxGetPr(plhs[0]), p.data(), sizeof(double)*p.rows()*p.cols());
+            memcpy(mxGetPr(plhs[1]), R.data(), sizeof(double)*R.rows()*R.cols());
+            cout << "translation: " << p << "\n";
+        }
+        else
+        {
+            mexErrMsgTxt("invalid input\n");
+        }
+
+    }
+
+
+
+    //---------------------------- getJointJacobianTimeVariation ----------------------------//
+    else if ( !strcmp(command, "getJointJacobianTimeVariation") )
+    {
+        lock_guard<mutex> guard(mtx);
+
+        if( !pin->initialized_ )
+        {
+            mexErrMsgTxt("Load the model first!\n");
+            return;
+        }        
+        
+        // check argument 
+        if( nrhs<4 && !mxIsNumeric(prhs[1]) && !mxIsNumeric(prhs[2]) && mxGetClassID(prhs[3])!=mxCHAR_CLASS )
+        {
+            mexErrMsgTxt("second and third input must be doubles and fourth input must be a string\n");
+            return;
+        }
+
+        Eigen::MatrixXd Jdot;
+        Jdot.setZero(6, pin->nv_);
+
+        Eigen::VectorXd q, dq;
+        q.setZero(pin->nq_);
+        dq.setZero(pin->nv_);
+
+        memcpy(q.data(), mxGetPr(prhs[1]), sizeof(double)*(pin->nq_));
+        memcpy(dq.data(), mxGetPr(prhs[2]), sizeof(double)*(pin->nv_));
+        
+        mxGetString(prhs[3], fieldname, 100);
+        if( pin->modelPtr_->existJointName((string) fieldname) )
+        {
+            pinocchio::JointIndex JOINT_ID = pin->modelPtr_->getJointId((string) fieldname);
+            pin->forwardKinematics(q);
+            pinocchio::computeJointJacobiansTimeVariation(*(pin->modelPtr_), *(pin->dataPtr_), q, dq);
+            pinocchio::getJointJacobianTimeVariation(*(pin->modelPtr_), *(pin->dataPtr_), JOINT_ID, pinocchio::ReferenceFrame::LOCAL_WORLD_ALIGNED, Jdot);
+            
+            plhs[0] = mxCreateDoubleMatrix(Jdot.rows(), Jdot.cols(), mxREAL);
+            memcpy(mxGetPr(plhs[0]), Jdot.data(), sizeof(double)*Jdot.rows()*Jdot.cols());
+        }
+        else
+        {
+            mexErrMsgTxt("invalid input\n");
+        }
+
+    }
+
 
     //---------------------------- crba ----------------------------//
     else if ( !strcmp(command, "crba") )

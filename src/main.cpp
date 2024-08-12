@@ -42,7 +42,10 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
     "  pin('load', file)      		                : initialize and load model file\n"
     "  pin('crba', q)      		                    : Joint space inertia matrix\n"
     "  pin('computeJointTorqueRegressor', q, v, a)  : Joint regressor matrix Y(q,dq,ddq)*PI=Tau\n"
-    "  pin(exit) or pin(quit)                       : terminate\n\n";
+    "  pin(exit) or pin(quit)                       : terminate\n"
+    "  pin('computeFrameJacobian', q, 'link')       : Computes frame jacobian of frame named link in the urdf\n"
+    "  pin('forwardKinematics', q)                  : Performs forward kinematics with joint configurations q \n"
+    "  pin('getJointJacobianTimeVariation', q, v, 'joint') : Computes time derrivative of the jacobian\n\n";
 
 
     
@@ -275,7 +278,6 @@ void mexFunction(int nlhs, mxArray* plhs[], int nrhs, const mxArray* prhs[])
             plhs[1] = mxCreateDoubleMatrix(R.rows(), R.cols(), mxREAL);
             memcpy(mxGetPr(plhs[0]), p.data(), sizeof(double)*p.rows()*p.cols());
             memcpy(mxGetPr(plhs[1]), R.data(), sizeof(double)*R.rows()*R.cols());
-            cout << "translation: " << p << "\n";
         }
         else
         {

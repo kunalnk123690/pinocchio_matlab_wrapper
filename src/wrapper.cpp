@@ -9,13 +9,14 @@ void MexFunction::operator()(ArgumentList outputs, ArgumentList inputs)
     "EXAMPLES:\n"
     "  pin('load', '../urdf/rrbot.urdf');\n"
     "COMMANDS AND PARAMETERS:\n"
-    "  pin('load', file)      		                : initialize and load model file\n"
-    "  pin('crba', q)      		                    : Joint space inertia matrix\n"
-    "  pin('computeJointTorqueRegressor', q, dq, ddq)  : Joint regressor matrix Y(q,dq,ddq)*PI=Tau\n"
-    "  pin('computeFrameJacobian', q, 'link')       : Computes frame jacobian of frame named link in the urdf\n"
-    "  pin('forwardKinematics', q)                  : Performs forward kinematics with joint configurations q \n"
+    "  pin('load', file)      		                       : initialize and load model file\n"
+    "  pin('crba', q)      		                           : Joint space inertia matrix\n"
+    "  pin('computeJointTorqueRegressor', q, dq, ddq)      : Joint regressor matrix Y(q,dq,ddq)*PI=Tau\n"
+    "  pin('computeFrameJacobian', q, 'link')              : Computes frame jacobian of frame named link in the urdf\n"
+    "  pin('forwardKinematics', q)                         : Performs forward kinematics with joint configurations q \n"
     "  pin('getJointJacobianTimeVariation', q, v, 'joint') : Computes time derrivative of the jacobian\n"
-    "  pin(exit) or pin(quit)                       : terminate\n\n";
+    "  pin('getDynamicParameters', BodyNo)                 : Gives the parameters PI=[m,mpx,mpy,mpz,Ixx,Ixy,Iyy,Ixz,Iyz,Izz]\n"
+    "  pin(exit) or pin(quit)                              : terminate\n\n";
 
 
     matlabPtr_ = getEngine();

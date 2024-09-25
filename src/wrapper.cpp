@@ -9,7 +9,7 @@ void MexFunction::operator()(ArgumentList outputs, ArgumentList inputs)
     "EXAMPLES:\n"
     "  pin('load', '../urdf/rrbot.urdf');\n"
     "COMMANDS AND PARAMETERS:\n"
-    "  pin('load', file)      		                       : initialize and load model file\n"
+    "  pin('load', file, floating_base=true/false)         : initialize and load model file\n"
     "  pin('crba', q)      		                           : Joint space inertia matrix\n"
     "  pin('computeJointTorqueRegressor', q, dq, ddq)      : Joint regressor matrix Y(q,dq,ddq)*PI=Tau\n"
     "  pin('computeFrameJacobian', q, 'link')              : Computes frame jacobian of frame named link in the urdf\n"
@@ -44,14 +44,15 @@ void MexFunction::operator()(ArgumentList outputs, ArgumentList inputs)
             return;
         }
 
-        if( inputs.size()<2 || inputs[1].getType()!= matlab::data::ArrayType::CHAR )
+        if( inputs.size()<2 || inputs[1].getType()!= matlab::data::ArrayType::CHAR || inputs[2].getType()!= matlab::data::ArrayType::LOGICAL )
         {
             displayError("urdf path must be a string\n");
             return;
         }        
 
         matlab::data::CharArray urdfStr = inputs[1];
-        setUrdf( urdfStr.toAscii() );
+        matlab::data::TypedArray<bool> is_floating = inputs[2];
+        setUrdf( urdfStr.toAscii(), is_floating[0] );
     }
 
 
@@ -66,7 +67,7 @@ void MexFunction::operator()(ArgumentList outputs, ArgumentList inputs)
         }        
         
         // check argument 
-        if( inputs.size()<2 || inputs[1].getType()!= matlab::data::ArrayType::CHAR )
+        if( inputs.size()<3 || inputs[1].getType()!= matlab::data::ArrayType::CHAR)
         {
             displayError("input must be a string\n");
             return;
@@ -457,10 +458,15 @@ void MexFunction::operator()(ArgumentList outputs, ArgumentList inputs)
 }
 
 
-void MexFunction::setUrdf(std::string filename)
+void MexFunction::setUrdf(std::string filename, bool is_floating)
 {
     modelPtr_ = new pinocchio::Model;
-    pinocchio::urdf::buildModel(filename, *modelPtr_);
+    if(is_floating){
+        pinocchio::urdf::buildModel(filename, pinocchio::JointModelFreeFlyer(), *modelPtr_);
+    }
+    else{
+        pinocchio::urdf::buildModel(filename, *modelPtr_);
+    }
     dataPtr_ = new pinocchio::Data(*modelPtr_);
 
 

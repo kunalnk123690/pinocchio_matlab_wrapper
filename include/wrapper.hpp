@@ -22,7 +22,7 @@ class MexFunction : public matlab::mex::Function
 
     public:
         void operator()(ArgumentList outputs, ArgumentList inputs);
-        void setUrdf(std::string filename);
+        void setUrdf(std::string filename, bool is_floating);
         void exitFunction();
         void displayError(std::string errormsg);
 
@@ -34,7 +34,7 @@ class MexFunction : public matlab::mex::Function
         matlab::data::ArrayFactory factory_;
         bool initialized_;
         pinocchio::Model *modelPtr_;
-        pinocchio::Data *dataPtr_;        
+        pinocchio::Data *dataPtr_;
         unsigned long nq_;
         unsigned long nv_;
 

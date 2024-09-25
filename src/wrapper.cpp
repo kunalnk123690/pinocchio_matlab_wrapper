@@ -67,7 +67,7 @@ void MexFunction::operator()(ArgumentList outputs, ArgumentList inputs)
         }        
         
         // check argument 
-        if( inputs.size()<3 || inputs[1].getType()!= matlab::data::ArrayType::CHAR)
+        if( inputs.size()<2 || inputs[1].getType()!= matlab::data::ArrayType::CHAR)
         {
             displayError("input must be a string\n");
             return;

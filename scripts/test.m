@@ -3,13 +3,14 @@ clear pin
 restoredefaultpath;
 addpath(fullfile('../build'));
 
-pin('quit')
+pin('exit')
 q = [pi/3; pi/4];
 dq = [0.5; 0.5];
 ddq = [0.5; 0.5];
 urdf = '../urdf/rrbot.urdf';
 
-pin('load', urdf)
+floating_base = false;
+pin('load', urdf, floating_base)
 pin('forwardKinematics', q);
 a = pin('getBodyId', 'link2');
 b = pin('getJointId', 'joint2');

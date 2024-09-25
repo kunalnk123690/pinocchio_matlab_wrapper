@@ -32,7 +32,6 @@ class MexFunction : public matlab::mex::Function
         // mutex mtx_;
         std::shared_ptr<matlab::engine::MATLABEngine> matlabPtr_;
         matlab::data::ArrayFactory factory_;
-        bool initialized_;
         pinocchio::Model *modelPtr_;
         pinocchio::Data *dataPtr_;
         unsigned long nq_;

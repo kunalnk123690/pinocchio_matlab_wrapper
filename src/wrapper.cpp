@@ -20,6 +20,7 @@ void MexFunction::operator()(ArgumentList outputs, ArgumentList inputs)
 
 
     matlabPtr_ = getEngine();
+    isFloating_ = false;
 
     if( inputs.size()<1 )
     {
@@ -52,6 +53,7 @@ void MexFunction::operator()(ArgumentList outputs, ArgumentList inputs)
 
         matlab::data::CharArray urdfStr = inputs[1];
         matlab::data::TypedArray<bool> is_floating = inputs[2];
+        isFloating_ = is_floating[0];
         setUrdf( urdfStr.toAscii(), is_floating[0] );
     }
 
@@ -429,11 +431,16 @@ void MexFunction::operator()(ArgumentList outputs, ArgumentList inputs)
         memcpy(&ID, in.release().get(), sizeof(double));
         int bodyID = (int) ID;
         
-        if( bodyID >= nbodies || bodyID < 0 )
-        {
+        if( isFloating_ ){
+            if(bodyID > nbodies || bodyID < 0){
+                displayError("Invalid BodyID\n");
+                return;
+            }
+        }
+        else if( bodyID >= nbodies || bodyID < 0 ){
             displayError("Invalid BodyID\n");
             return;
-        }        
+        }
         else{
             double *out_;
             out_ = modelPtr_->inertias[bodyID].toDynamicParameters().data();

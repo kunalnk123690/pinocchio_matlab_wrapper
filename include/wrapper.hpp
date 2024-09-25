@@ -35,6 +35,7 @@ class MexFunction : public matlab::mex::Function
         bool initialized_;
         pinocchio::Model *modelPtr_;
         pinocchio::Data *dataPtr_;
+        bool isFloating_;
         unsigned long nq_;
         unsigned long nv_;
 

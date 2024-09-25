@@ -20,7 +20,7 @@ J = pin('computeFrameJacobian', q, 'ee_link');
 [pose, R] = pin('data.oMf.pose', 'ee_link');
 Jdot = pin('getJointJacobianTimeVariation', q, dq, 'joint2');
 Y = pin('computeJointTorqueRegressor', q, dq, ddq);
-PI = pin('getDynamicParameters', 2);
+PI = pin('getDynamicParameters', 1)
 
 [m, pc, Irot] = getParams(PI);
 S = hat(pc);
